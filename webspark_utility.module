@@ -7,4 +7,14 @@ function webspark_utility_form_media_library_add_form_upload_alter(&$form, \Drup
   $form['#attached']['library'][] = 'webspark_utility/medialibrary';
 }
 
-
+/**
+ * Implements hook_entity_bundle_field_info_alter().
+ */
+function webspark_utility_entity_bundle_field_info_alter(&$fields, \Drupal\Core\Entity\EntityTypeInterface $entity_type, $bundle) {
+  if ($bundle === 'hero') {
+    if (isset($fields['field_hero_unformatted_text'])) {
+      // Use the ID as defined in the annotation of the constraint definition
+      $fields['field_hero_unformatted_text']->addConstraint('HeroCharacterConstraint', []);
+    }
+  }
+}
