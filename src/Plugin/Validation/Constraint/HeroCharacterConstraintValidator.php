@@ -18,8 +18,8 @@ class HeroCharacterConstraintValidator extends ConstraintValidator {
       // Get the value and check length.
       if (($item->value)) {
         $length = strlen($item->value);
-        if ($length > 300) {
-          $remove = $length - 300;
+        if ($length > 125) {
+          $remove = $length - 125;
           $this->context->addViolation($constraint->tooLong, ['%length' => $length, '%remove' => $remove]);
         }
       }

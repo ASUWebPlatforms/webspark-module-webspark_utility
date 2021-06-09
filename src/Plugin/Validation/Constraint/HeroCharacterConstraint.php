@@ -16,6 +16,6 @@ use Symfony\Component\Validator\Constraint;
 class HeroCharacterConstraint extends Constraint {
 
   // The message that will be shown if the value is too many characters.
-  public $tooLong = 'Hero Text has to many characters. You have entered %length, Remove %remove characters.';
+  public $tooLong = 'Hero Text field has to many characters. You have entered %length, Remove %remove characters.';
 
 }
