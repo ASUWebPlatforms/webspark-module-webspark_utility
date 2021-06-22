@@ -4,7 +4,3 @@ select2overrides:
   css:
     component:
       css/select2-overrides.css: {}
-medialibrary:
-  css:
-    component:
-      css/medialibrary-overrides.css: {}
