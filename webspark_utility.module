@@ -25,6 +25,10 @@ function webspark_utility_entity_bundle_field_info_alter(&$fields, \Drupal\Core\
  */
 function webspark_utility_form_node_type_add_form_alter(&$form, \Drupal\Core\Form\FormStateInterface $form_state, $form_id) {
   $form['actions']['submit']['#submit'][] = '_webspark_utility_form_node_type_add_form_submit';
+  // If the form is already processed.
+  if (isset($form['actions']['save_continue']['#submit'])) {
+    $form['actions']['save_continue']['#submit'][] = '_webspark_utility_form_node_type_add_form_submit';
+  }
 }
 
 /**
