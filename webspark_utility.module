@@ -19,6 +19,39 @@ function webspark_utility_entity_bundle_field_info_alter(&$fields, \Drupal\Core\
   }
 }
 
+
+/**
+ * Implements hook_form_FORM_ID_alter()
+ */
+function webspark_utility_form_node_type_add_form_alter(&$form, \Drupal\Core\Form\FormStateInterface $form_state, $form_id) {
+  $form['actions']['submit']['#submit'][] = '_webspark_utility_form_node_type_add_form_submit';
+}
+
+/**
+ * Submit function for the node_type_add_form to set some defaults to display view.
+ */
+function _webspark_utility_form_node_type_add_form_submit(array $form, \Drupal\Core\Form\FormStateInterface $form_state) {
+
+  if (!\Drupal::moduleHandler()->moduleExists('layout_builder')) {
+    return TRUE;
+  }
+  // Take the currently created bundle.
+  $bundle = $form_state->getFormObject()->getEntity()->id();
+
+  // In case you need all the view modes.
+  // $view_modes = \Drupal::service('entity_display.repository')->getViewModeOptionsByBundle('node', $bundle);
+
+  // Set as default to use layout builder on the default view.
+  $default_view = \Drupal::entityTypeManager()
+    ->getStorage('entity_view_display')
+    ->load('node.' . $bundle . '.default');
+
+  $default_view
+    ->enableLayoutBuilder()
+    ->setOverridable()
+    ->save();
+}
+
 /**
  * Implements hook_field_widget_WIDGET_TYPE_form_alter()
  */
