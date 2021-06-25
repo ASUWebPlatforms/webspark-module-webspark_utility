@@ -18,3 +18,19 @@ function webspark_utility_entity_bundle_field_info_alter(&$fields, \Drupal\Core\
     }
   }
 }
+
+/**
+ * Implements hook_field_widget_WIDGET_TYPE_form_alter()
+ */
+function webspark_utility_field_widget_field_menu_tree_widget_form_alter(&$element, \Drupal\Core\Form\FormStateInterface $form_state, $context) {
+  // Remove the default menus. If you need more in depth solution, check the
+  // locked parameter; parentSelectElement() method doesnt have an option for this.
+  $default_menus = ['account', 'admin', 'devel', 'footer', 'main', 'tools'];
+  foreach ($element['menu_item_key']['#options'] as $key => $menu) {
+    $menu_key = substr($key, 0, strpos($key, ":"));
+    if (in_array($menu_key, $default_menus)) {
+      unset($element['menu_item_key']['#options'][$key]);
+    }
+  }
+
+}
