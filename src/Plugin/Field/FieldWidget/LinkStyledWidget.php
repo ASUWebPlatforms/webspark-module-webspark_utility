@@ -168,8 +168,8 @@ class LinkStyledWidget extends LinkWidget implements ContainerFactoryPluginInter
     return [
       $size . ' btn-gold btn' => t('Gold'),
       $size . ' btn-maroon btn' => t('Maroon'),
-      $size . ' btn-gray btn' => t('Light'),
-      $size . ' btn-dark btn' => t('Dark'),
+      $size . ' btn-gray btn' => t('Gray'),
+      $size . ' btn-dark btn' => t('Black'),
     ];
   }
 
