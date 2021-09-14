@@ -71,3 +71,15 @@ function webspark_utility_field_widget_field_menu_tree_widget_form_alter(&$eleme
   }
 
 }
+
+/**
+ * Implements hook_form_alter().
+ */
+function webspark_utility_form_alter(&$form, \Drupal\Core\Form\FormStateInterface $form_state, $form_id) {
+  if (isset($form['#entity_type']) && $form['#entity_type'] == 'block_content') {
+    if (isset($form['field_icon'])) {
+      // Remove the browser validation on the icon picker widget.
+      $form['#attributes']['novalidate'] = 'novalidate';
+    }
+  }
+}
