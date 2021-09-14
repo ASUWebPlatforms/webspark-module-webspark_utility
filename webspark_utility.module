@@ -106,7 +106,7 @@ function webspark_uitlity_revert_all($module) {
       if (!$config->revert($type, $name)) {
         // Try to insert the config. If the return from the update is FALSE
         // because the config was not active, it will insert the config.
-        if (!$config->insert($type, $name)) {
+        if (!$config->import($type, $name)) {
           // At this point it means that the file does not exist in either 
           // install or optional folders.
           
