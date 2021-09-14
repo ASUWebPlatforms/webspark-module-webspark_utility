@@ -71,3 +71,121 @@ function webspark_utility_field_widget_field_menu_tree_widget_form_alter(&$eleme
   }
 
 }
+
+/**
+ * Revert/insert all the configuration files of a module.
+ * @param string $module
+ * @throws Exception
+ */
+function webspark_uitlity_revert_all($module) {
+
+  // Get the config service.
+  $config = \Drupal::service('config_update.config_update');
+    
+  // Unlock the configuration storage.
+  \Drupal::state()->set('configuration_locked', FALSE);
+  // Get all the configs.
+  $data = webspark_uitlity_get_all_module_configs($module);
+  foreach ($data as $type => $items) {
+    foreach ($items as $name) {
+      // Try to update the config. It will return FALSE if the config 
+      // does not exist in the active configuration storage ot the config file
+      // does not exist in the modules.
+      if (!$config->revert($type, $name)) {
+        // Try to insert the config. If the return from the update is FALSE
+        // because the config was not active, it will insert the config.
+        if (!$config->insert($type, $name)) {
+          // At this point it means that the file does not exist in either 
+          // install or optional folders.
+          
+          // Recreate the filename
+          if ($type == 'system.simple' || !$type) {
+            $filename = $name . 'yml';
+          }
+          $definition = \Drupal::service('entity_type.manager')->getDefinition($type);
+          if ($definition) {
+            $filename = $definition->getConfigPrefix() . '.' . $name . '.yml';
+          }
+          else {
+            throw new Exception('The config entity of type: ' . $type . ' does not exist');
+          }
+          
+          throw new Exception('Could not find the configuration file: ' . $filename);
+        }
+      }
+    }
+  }
+  // Lock the configuration storage.
+  \Drupal::state()->set('configuration_locked', TRUE);
+}
+
+
+/**
+ * Get a formated list of configuration files from a module
+ * that can be used by the configuration update module.
+ * 
+ * @param string $module
+ * @return array
+ */
+function webspark_uitlity_get_all_module_configs($module) {
+  // Get all the config files for this module.
+  $configs = webspark_uitlity_get_module_config_files($module);
+  
+  // Get all config entity types in the system.
+  $entity_types_list = webspark_uitlity_get_config_entites_info();
+  
+  // Arrange the entity configs in a [$type => $name] array 
+  // to be used with config update module
+  foreach ($entity_types_list as $prefix => $entity_name) {
+    foreach ($configs as $id => $name) {
+      if (strpos($name, $prefix) === 0) {
+        $list[$entity_name][] = strtr($name, [$prefix . '.' => '']);
+        unset($configs[$id]);
+      }
+    }
+  }
+  
+  // Add the simple config list
+  foreach ($configs as $name) {
+    $list['system.simple'][] = $name;
+  }
+  
+  return $list;
+}
+
+/**
+ * Returns a list of configurations files from a given module.
+ * @param string $module
+ * @return array
+ */
+function webspark_uitlity_get_module_config_files($module) {
+  // Get the config storage.
+  $storage = \Drupal::service('config_update.extension_storage');
+  // Get the module path.
+  $module_path = \Drupal::service('module_handler')->getModule($module)->getPath();
+  
+  // Get all the config files.
+  $listing = new \Drupal\Core\Extension\ExtensionDiscovery(\Drupal::root());
+  return array_keys(array_filter(
+      $storage->getComponentNames($listing->scan('module')), 
+      function ($item) use ($module_path) { return strpos($item, $module_path) === 0; }));
+}
+
+/**
+ * Get the list of all config entities in the system.
+ * @return array
+ */
+function webspark_uitlity_get_config_entites_info() {
+  // Get all config entity types in the system.
+  $entity_type_manager = \Drupal::service('entity_type.manager');
+  $entity_definitions = $entity_type_manager->getDefinitions();
+  // Create a list of config entity types.
+  $entity_types_list = [];
+  foreach($entity_definitions as $entity_name => $entity_definition) {
+    if ($entity_definition instanceof \Drupal\Core\Config\Entity\ConfigEntityType) {
+      $entity_types_list[$entity_definition->getConfigPrefix()] = $entity_name;
+    }
+  }
+  
+  return $entity_types_list;
+}
