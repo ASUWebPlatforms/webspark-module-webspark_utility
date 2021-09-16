@@ -1,11 +1,5 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 namespace Drupal\webspark_utility;
 
 use Drupal\Core\Config\StorageInterface;
@@ -30,14 +24,14 @@ class WebsparkUtilityConfigManager {
   protected $entityManager;
 
   /**
-   * The active config storage.
+   * The active configuration storage.
    *
    * @var \Drupal\Core\Config\StorageInterface
    */
   protected $activeConfigStorage;
 
   /**
-   * The extension config storage for config/install config items.
+   * The extension configuration storage for config/install config items.
    *
    * @var \Drupal\Core\Config\StorageInterface
    */

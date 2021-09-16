@@ -6,7 +6,7 @@ use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\DependencyInjection\ServiceProviderBase;
 
 /**
- * Modifies the language manager service.
+ * Modifies the config_readonly_form_subscriber service.
  */
 class WebsparkUtilityServiceProvider extends ServiceProviderBase {
 
@@ -14,11 +14,7 @@ class WebsparkUtilityServiceProvider extends ServiceProviderBase {
    * {@inheritdoc}
    */
   public function alter(ContainerBuilder $container) {
-    // Overrides language_manager class to test domain language negotiation.
-    // Adds entity_type.manager service as an additional argument.
-
-    // Note: it's safest to use hasDefinition() first, because getDefinition() will 
-    // throw an exception if the given service doesn't exist.
+    // Overrides config_readonly_form_subscriber class.
     if ($container->hasDefinition('config_readonly_form_subscriber')) {
       $definition = $container->getDefinition('config_readonly_form_subscriber');
       $definition->setClass('Drupal\webspark_utility\EventSubscriber\ReadOnlyFormSubscriber');
