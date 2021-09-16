@@ -93,29 +93,26 @@ class WebsparkUtilityConfigManager {
     // Update existing configuration.
     foreach ($data['update'] as $type => $items) {
       foreach ($items as $name) {
-        $filename = $this->getFullName($type, $name);
         try {
-          $res = $this->configReverter->revert($type, $name);
+          $this->updateConfig($type, $name);
         } catch (FieldStorageDefinitionUpdateForbiddenException $e) {
+          $filename = $this->getFullName($type, $name);
           throw new Exception('Forbidden values in the configuration file: ' . $filename);
-        }
-
-        if (!$res) {
-          throw new Exception('Could not update the configuration file: ' . $filename);
         }
       }
     }
   }
   
   /**
-   * Revert a single configuration file
+   * Revert a single configuration file.
+   * This deals with dependencies.
    * @param type $filename
    *  The file name without the file extension.
    */
   public function updateConfigFile($filename) {
-    list($t, $n) = $this->getSplitName($filename);
+    list($type, $name) = $this->getSplitName($filename);
     
-    $this->configReverter->revert($type, $name);
+    return $this->updateConfig($type, $name);
   }
   
   /**
@@ -125,9 +122,34 @@ class WebsparkUtilityConfigManager {
    *  The file name without the file extension.
    */
   public function importConfigFile($filename) {
-    list($t, $n) = $this->getSplitName($filename);
+    list($type, $name) = $this->getSplitName($filename);
     
-    $this->importConfig($type, $name);
+    return $this->importConfig($type, $name);
+  }
+  
+  /**
+   * Revert a new configuration by $type and $name.
+   * @param type $type
+   * @param type $name
+   * @throws Exception
+   */
+  protected function updateConfig($type, $name) {
+    
+    // Recreate the filename
+    $filename = $this->getFullName($type, $name);
+    if (empty($filename)) {
+      throw new Exception('The config entity of type: ' . $type . ' does not exist');
+    }
+    
+    // Check for dependencies.
+    $this->importDependencies($filename);
+    
+    // Import the current file.
+    if (!$this->configReverter->revert($type, $name)) {
+      // At this point it means that the file does not exist in either 
+      // install or optional folders.
+      throw new Exception('Could not revert the configuration file: ' . $filename);
+    }
   }
   
   /**
@@ -150,16 +172,7 @@ class WebsparkUtilityConfigManager {
     }
 
     // Check for dependencies.
-    $value = $this->extensionConfigStorage->read($filename);
-    // If we have dependencies, try to import those first.
-    if (!empty($value['dependencies']['config'])) {
-      foreach ($value['dependencies']['config'] as $dependency) {
-        // Get the type => name pair.
-        list($t, $n) = $this->getSplitName($dependency);
-        // Import the dependency.
-        $this->importConfig($t, $n);
-      }
-    }
+    $this->importDependencies($filename);
 
     // Import the current file.
     if (!$this->configReverter->import($type, $name)) {
@@ -289,5 +302,22 @@ class WebsparkUtilityConfigManager {
       return FALSE;
     }
   }
-
+  
+  /**
+   * Import the dependencies from a config file.
+   * @param type $filename
+   */
+  protected function importDependencies($filename) {
+    // Check for dependencies.
+    $value = $this->extensionConfigStorage->read($filename);
+    // If we have dependencies, try to import those first.
+    if (!empty($value['dependencies']['config'])) {
+      foreach ($value['dependencies']['config'] as $dependency) {
+        // Get the type => name pair.
+        list($type, $name) = $this->getSplitName($dependency);
+        // Import the dependency.
+        $this->importConfig($type, $name);
+      }
+    }
+  }
 }
