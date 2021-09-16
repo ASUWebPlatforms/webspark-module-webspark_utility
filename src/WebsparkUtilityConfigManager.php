@@ -112,7 +112,7 @@ class WebsparkUtilityConfigManager {
   public function updateConfigFile($filename) {
     list($type, $name) = $this->getSplitName($filename);
     
-    return $this->updateConfig($type, $name);
+    $this->updateConfig($type, $name);
   }
   
   /**
@@ -124,7 +124,7 @@ class WebsparkUtilityConfigManager {
   public function importConfigFile($filename) {
     list($type, $name) = $this->getSplitName($filename);
     
-    return $this->importConfig($type, $name);
+    $this->importConfig($type, $name);
   }
   
   /**
