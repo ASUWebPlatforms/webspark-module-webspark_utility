@@ -97,7 +97,7 @@ class WebsparkUtilityConfigManager {
           $this->updateConfig($type, $name);
         } catch (FieldStorageDefinitionUpdateForbiddenException $e) {
           $filename = $this->getFullName($type, $name);
-          throw new Exception('Forbidden values in the configuration file: ' . $filename);
+          throw new \Exception('Forbidden values in the configuration file: ' . $filename);
         }
       }
     }
@@ -138,7 +138,7 @@ class WebsparkUtilityConfigManager {
     // Recreate the filename
     $filename = $this->getFullName($type, $name);
     if (empty($filename)) {
-      throw new Exception('The config entity of type: ' . $type . ' does not exist');
+      throw new \Exception('The config entity of type: ' . $type . ' does not exist');
     }
     
     // Check for dependencies.
@@ -148,7 +148,7 @@ class WebsparkUtilityConfigManager {
     if (!$this->configReverter->revert($type, $name)) {
       // At this point it means that the file does not exist in either 
       // install or optional folders.
-      throw new Exception('Could not revert the configuration file: ' . $filename);
+      throw new \Exception('Could not revert the configuration file: ' . $filename);
     }
   }
   
@@ -163,7 +163,7 @@ class WebsparkUtilityConfigManager {
     // Recreate the filename
     $filename = $this->getFullName($type, $name);
     if (empty($filename)) {
-      throw new Exception('The config entity of type: ' . $type . ' does not exist');
+      throw new \Exception('The config entity of type: ' . $type . ' does not exist');
     }
 
     // Check if the config is already in the system.
@@ -178,7 +178,7 @@ class WebsparkUtilityConfigManager {
     if (!$this->configReverter->import($type, $name)) {
       // At this point it means that the file does not exist in either 
       // install or optional folders.
-      throw new Exception('Could not find the configuration file: ' . $filename);
+      throw new \Exception('Could not find the configuration file: ' . $filename);
     }
   }
 
