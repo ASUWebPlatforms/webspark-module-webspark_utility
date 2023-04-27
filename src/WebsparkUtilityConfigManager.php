@@ -264,7 +264,7 @@ class WebsparkUtilityConfigManager {
    * @return array
    *  A list with $type and $name
    */
-  protected function getSplitName($filename) {
+  protected function getSplitName(string $filename): array {
 
     // Arrange the entity config in a [$type => $name] array 
     // to be used with config update module
@@ -275,7 +275,7 @@ class WebsparkUtilityConfigManager {
     }
 
     // If it's not an entity it means it's a simple config.
-    return ['system.simple', $name];
+    return ['system.simple', $filename];
   }
 
   /**
